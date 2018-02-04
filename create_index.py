@@ -3,13 +3,14 @@ import os
 import sqlite3
 def clean_word(word):
     #clean all the unnessary punctuation from the word
-    punctuation = [',','.','/','?','!',"'",'"']
+    punctuation = [',','.','/','?','!',"'",'"',':',';','*','(',')']
     for i in punctuation:
         try:
             word = word.replace(i,'')
         except:
             print ("clean_word error:",word)
             continue
+    word = word.lower()
     return word
     
 def create_index(pathname,name,conn):
@@ -30,13 +31,15 @@ def create_index(pathname,name,conn):
             except KeyError:
                 file_index[word] = [i]
             i += 1
-
     for word in file_index:
         #input into database
         c = conn.cursor()
         position = str(file_index[word])[1:-1]#list tsqlo string to store in db
         query = 'INSERT INTO searchIndex VALUES("'+word+'",'+str(movie_id)+',"'+position+'")'
-        c.execute(query)
+        try:#if table already exist then pass
+            c.execute(query)
+        except sqlite3.IntegrityError:
+            continue
     conn.commit()
 
          
@@ -45,14 +48,16 @@ def create_index(pathname,name,conn):
 	
 def main():
     #init+check argument
-    if len(sys.argv) != 2:
+    if len(sys.argv) > 2:
         print ("invalid arguement")
         return 
-
+    elif len(sys.argv)== 1:
+        index_dir = "."
+    else:
+        index_dir = str(sys.argv[1])
 
     #load file
     try:
-        index_dir = str(sys.argv[1])
         filename_list = os.listdir(index_dir)
     except: 
         print ("error when loading directory")
@@ -79,6 +84,10 @@ def main():
     
     #create index for the table so it's faster
     c = conn.cursor()
-    c.execute("CREATE INDEX word_idx ON searchIndex(word);")
+    try:#if index already exist then pass
+        c.execute("CREATE INDEX word_idx ON searchIndex(word,movie_id);")
+    except sqlite3.OperationalError:
+        pass
+        
     conn.close()
 main()
