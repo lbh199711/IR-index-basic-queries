@@ -11,7 +11,12 @@ def main():
         index_dir = str(sys.argv[1])
     
     
-    conn = sqlite3.connect(index_dir+'/table.db')
+    try:
+        conn = sqlite3.connect(index_dir+'/table.db')
+    except sqlite3.OperationalError:
+        print ("database error")
+        return
+
     c = conn.cursor()
     try:
         c.execute("SELECT * from searchIndex order by word,movie_id")

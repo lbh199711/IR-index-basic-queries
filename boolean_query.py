@@ -151,6 +151,7 @@ def main():
         conn = sqlite3.connect(index_dir+'/table.db')
     except sqlite3.OperationalError:
         print ("database error")
+        return
     #so far assume there s no parenthesis 
     #and assume only 2 words
     query = query.lower().split()
