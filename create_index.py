@@ -3,13 +3,14 @@ import os
 import sqlite3
 def clean_word(word):
     #clean all the unnessary punctuation from the word
-    punctuation = [',','.','/','?','!',"'",'"',':',';','*','(',')','-']
+    punctuation = [',','.','/','?','!',"'",'"',':',';','*','(',')']
     for i in punctuation:
         try:
             word = word.replace(i,'')
         except:
             print ("clean_word error:",word)
             continue
+        
     word = word.lower()
     return word
     
