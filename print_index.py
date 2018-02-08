@@ -35,12 +35,12 @@ def main():
 
         
 
-        if word != old:
-            print (word,end="\t")
-        print(movie_id,end=":")
+        if word != old:#term
+            print (word,end="\t")# \t 
+        print(movie_id,end=":")#doc_id:
         for i in range(len(position)):
             print(position[i],end="")
-            if i != len(position)-1:
+            if i != len(position)-1:#pos,
                 print(",",end="")#if not at the end print ','
             
         
