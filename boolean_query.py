@@ -17,13 +17,13 @@ def boolean_query(op,list1,list2):
                 break 
 
             #x pointer compare with y pointer
-            if list1[x]==list2[y]:#if eq then move onto next
+            if list1[x][0]==list2[y][0]:#if eq then move onto next
                 outputlist.append(list1[x])
                 x += 1#move pointer
                 y += 1
-            elif list1[x]<list2[y]:#if one list is smaller then move it
+            elif list1[x][0]<list2[y][0]:#if one list is smaller then move it
                 x += 1
-            elif list1[x]>list2[y]:
+            elif list1[x][0]>list2[y][0]:
                 y += 1           
             
     elif op.upper() == 'OR':#OR operation
@@ -37,15 +37,15 @@ def boolean_query(op,list1,list2):
                 outputlist = outputlist+list1[x:]
                 break
             #compare pointers
-            if list1[x]==list2[y]:
+            if list1[x][0]==list2[y][0]:
                 outputlist.append(list1[x])
                 x += 1#move pointer
                 y += 1
-            elif list1[x]<list2[y]:#if they are not equal then just add the smallest one and move on
+            elif list1[x][0]<list2[y][0]:#if they are not equal then just add the smallest one and move on
                 outputlist.append(list1[x])
                 x += 1
                 
-            elif list1[x]>list2[y]:
+            elif list1[x][0]>list2[y][0]:
                 outputlist.append(list2[y])
                 y += 1
 
@@ -74,13 +74,13 @@ def not_query(list1,conn):
             outputlist = outputlist+total[y:]
             break
         #compare pointers
-        if list1[x]==total[y]:
+        if list1[x][0]==total[y][0]:
             x += 1#move pointer
             y += 1
-        elif list1[x]>total[y]:#if not eq then append outputlist
+        elif list1[x][0]>total[y][0]:#if not eq then append outputlist
             outputlist.append(total[y])
             y += 1
-        elif list1[x]<total[y]:#list1[x] should never be smaller than total[y]
+        elif list1[x][0]<total[y][0]:#list1[x] should never be smaller than total[y]
             print("something went wrong in not_query x=",x," y=",y)
             return -1
     print(outputlist)
@@ -153,27 +153,59 @@ def main():
         print ("database error")
         return
 
-    #get rid of the term querys first
-    
-    
-    #so far assume there s no parenthesis 
-    #and assume only 2 words
+    #split query
+    query = query.replace("("," ( ")
+    query = query.replace(")"," ) ")
     query = query.lower().split()
-    word_list={}
-    for i in [0,2]:
-        c = conn.cursor()
-        c.execute("SELECT distinct movie_id,position FROM searchIndex WHERE word='"+query[i]+"' ORDER BY movie_id;")
-        word_list[query[i]]=c.fetchall()
-    print (word_list)
-    IOlist = term_query(word_list[query[0]],word_list[query[2]])
-	
-    for i in IOlist:
-        print(i)
-		
-	    
+    
+    #get rid of the term querys first
+    term_temp = []#list of word in a term query
+    term_inside = False
+    for i in range(len(query)):
+        word = query[i]
+        if term_inside:#if it is inside a term query
+            if word[-1]=="'"or word[-1]=='"':#see if it is the end
+                term_temp.append(word[:-1])#add to temp list with
+                
+                #do term_query and add list back to (origin)query
+                for j in range(len(term_temp)):
+                    c = conn.cursor()
+                    c.execute("SELECT DISTINCT movie_id,position FROM searchIndex WHERE word='"+term_temp[j]+"' ORDER BY movie_id;")
+                    if j == 0:#if it is the start then just fetch
+                        term_output = c.fetchall()
+                    else:#else do term_query with last output with new term
+                        term_output = term_query(term_output,c.fetchall())
+                query[i] = term_output
+
+                term_inside=False#Not inside anymore
+                term_temp= []#clear out temp list
+            else:#if it is not the end
+                term_temp.append(word)#then just add the word
+                query[i]= None#remove word from (original)query
+        else:#if it is not inside
+            if word[0]=="'"or word[0]=='"':#see if it is the start
+                term_inside= True#inside term query
+                term_temp.append(word[1:])
+                query[i]=None
+            else: 
+                continue#else just pass
+        
+    #now while loop til done
+    i = 0 #<- pointer
+    in_sub_query=False                  
+    while(1):
+        if query[i]==None:#clear out the filler objects
+            query.pop(i)
+        elif query[i]=="(":#trying to find the most inner (
+            sub_query= []#clear out the list 
+            in_sub_query = True
+        elif query[i]==")":#end of a subquery and do stuff
+            in_sub_query= False
+            
+        i += 1#next
+    
     conn.close()
     
-    
     print (sys.argv)
-
+    print (query)
 main()
