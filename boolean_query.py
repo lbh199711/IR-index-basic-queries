@@ -152,6 +152,10 @@ def main():
     except sqlite3.OperationalError:
         print ("database error")
         return
+
+    #get rid of the term querys first
+    
+    
     #so far assume there s no parenthesis 
     #and assume only 2 words
     query = query.lower().split()
