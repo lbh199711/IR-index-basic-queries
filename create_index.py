@@ -1,18 +1,7 @@
 import sys
 import os
 import sqlite3
-def clean_word(word):
-    #clean all the unnessary punctuation from the word
-    punctuation = [',','.','/','?','!',"'",'"',':',';','*','(',')']
-    for i in punctuation:
-        try:
-            word = word.replace(i,'')
-        except:
-            print ("clean_word error:",word)
-            continue
-        
-    word = word.lower()
-    return word
+from utils import *
     
 def create_index(pathname,name,conn):
     #go through the file and input every word into db
@@ -22,7 +11,9 @@ def create_index(pathname,name,conn):
     i = 0
     file_index = {}
     for line in fp:
+
         text = line.split()
+        
         for word in text:
             word = clean_word(word)
             if word == "":

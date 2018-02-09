@@ -1,5 +1,6 @@
 import sys
 import sqlite3
+from utils import *
 
 total = []
 
@@ -157,6 +158,9 @@ def main():
     query = query.replace("("," ( ")
     query = query.replace(")"," ) ")
     query = query.lower().split()
+    for i in range(len(query)):
+        if query[i] != " ( " and query[i] != " ) ":
+            query[i] = clean_word(query[i])
     
     #get rid of the term querys first
     term_temp = []#list of word in a term query

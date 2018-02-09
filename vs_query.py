@@ -1,21 +1,8 @@
 import sys
 import sqlite3
 import math
+from utils import *
 
-def delete_dup(input_list):
-    #sort and remove duplicates from a list
-    input_list.sort()
-    i = 0
-    old = -1
-    output_list = []
-    while(i<len(input_list)):
-        if input_list[i] != old:
-            output_list.append(input_list[i])
-            old = input_list[i]
-        i += 1
-       
-    return output_list
-    
 def main():
     #connect to database
     if len(sys.argv)<5:
@@ -34,6 +21,10 @@ def main():
         print ("database error")
         return
     
+    for i in range(len(raw_terms)):
+        raw_terms[i]=clean_word(raw_terms[i])
+    
+
     #make the terms list unique
     terms = delete_dup(raw_terms)  
 
