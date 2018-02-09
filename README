@@ -1,0 +1,18 @@
+create_index.py:
+input: python3 create_index.py [file_dir]
+
+print_index.py:
+input: python3 print_index.py [database_dir]
+
+boolean_query.py:
+input: python3 boolean_query.py [database_dir] [query]
+restraint: [query] have to have to be one input, that means covered with "" or '' in command line
+restraint: if NOT exist in [query], then whatever is after have to be covered with (),eg.NOT (person), NOT ("heart attack")
+restraint: everyword have to have space in between,eg. her and him, (again^^) NOT ("heart attack")
+
+vs_query.py:
+input: python3 vs_query.py [database_dir] [k] [scores] [word1] [word2] [word3]
+
+Tokenization:
+I used stemming in this query however did not touch anything with the input of phrase search.
+I cleaned all the punctuation marks of the word first, then if len(word)>= 4 remove 'es' and 's' but kept 'ss' at the end of the word 
