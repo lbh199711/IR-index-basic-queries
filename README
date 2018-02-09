@@ -16,3 +16,6 @@ input: python3 vs_query.py [database_dir] [k] [scores] [word1] [word2] [word3]
 Tokenization:
 I used stemming in this query however did not touch anything with the input of phrase search.
 I cleaned all the punctuation marks of the word first, then if len(word)>= 4 remove 'es' and 's' but kept 'ss' at the end of the word 
+
+ASSUMPTION:
+assume database already existed on everything but create_index.py
